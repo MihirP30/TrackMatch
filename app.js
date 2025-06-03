@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 // let judgeIndexes = {}
 
 const admin = require('firebase-admin')
-const serviceAccount = require('./TrackMatch Firebase Service Account.json') // you’ll download this below
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://trackmatch-3b0b8-default-rtdb.firebaseio.com/"
