@@ -1,0 +1,124 @@
+<!-- index.html -->
+<html>
+  <head>
+    <link rel="stylesheet" href="./styles.css"/>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+      import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+      // https://firebase.google.com/docs/web/setup#available-libraries
+    
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyByFucg7STG3_Kn7urGQK7NpKoMBRgA5bo",
+        authDomain: "trackmatch-3b0b8.firebaseapp.com",
+        projectId: "trackmatch-3b0b8",
+        storageBucket: "trackmatch-3b0b8.firebasestorage.app",
+        messagingSenderId: "518540168682",
+        appId: "1:518540168682:web:6d48b46e77b6d706ad7693"
+      };
+    
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      // Export to global scope if needed
+      window.firebaseDB = db;
+      window.firebaseRef = ref;
+      window.firebaseSet = set;
+      window.firebaseOnValue = onValue;
+      window.firebaseUpdate = update;
+    </script>
+  </head>
+  <body>
+    <div id="nameForm">
+      <input type="text" id="playerNameInput" placeholder="Enter Your Name"/>
+      <button onclick="createRoom()">Create Room</button>
+      <input type="text" id="roomCodeInput" placeholder="Room Code (e.g., ABCD)" maxlength="4" style="text-transform: uppercase;" />
+      <button onclick="joinRoom()">Join Room</button>
+      <!-- <button onclick="submitName()">Join</button> -->
+    </div>
+
+    <div id="lobbyUI">
+      <div id="circleContainer">
+        <img id="gameLogo" src="./assets/logo-nbg.png" alt="Game Logo" />
+        <div id="roomCode">TrackMatch</div> <!--placeholder-->
+    
+        <!-- Player name boxes (filled dynamically) -->
+        <div class="playerSlot" id="slot0"></div>
+        <div class="playerSlot" id="slot1"></div>
+        <div class="playerSlot" id="slot2"></div>
+        <div class="playerSlot" id="slot3"></div>
+        <div class="playerSlot" id="slot4"></div>
+        <div class="playerSlot" id="slot5"></div>
+      </div>
+    
+      <button id="startGameBtn">Start Game</button>
+    </div>
+
+    <div id="judgeUI" style="display: none;">
+      <h2>Choose a Theme</h2>
+      <div id="themeOptions"></div>
+
+      <div>
+        <input type="text" id="customThemeInput" placeholder="Or enter your own theme" />
+        <button id="submitCustomThemeBtn">Submit Custom Theme</button>
+      </div>
+    </div>
+
+    <div id="submitUI" style="display: none;">
+      <h2>Theme: <span id="currentThemeText"></span></h2>
+      <input type="text" id="searchInput" placeholder="Search for a song..." />
+      <button onclick="searchSongs()">Search</button>
+    
+      <div id="results"></div>
+    
+      <audio id="player" controls style="margin-top: 20px; display: none;"></audio>
+    </div>
+
+    <div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; 
+        width: 100%; height: 100%; background: rgba(0,0,0,0.6); 
+        align-items: center; justify-content: center; z-index: 9999;">
+      <div style="background: white; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
+        <p id="confirmText" style="margin-bottom: 20px;">Submit this song?</p>
+        <button id="confirmYes" style="margin-right: 10px;">Yes, Submit</button>
+        <button id="confirmNo">Cancel</button>
+      </div>
+    </div>
+    
+    <div id="errorModal" class="modal hidden">
+      <div class="modal-content">
+        <p id="errorText"></p>
+        <button onclick="hideErrorModal()">OK</button>
+      </div>
+    </div>
+    
+    <div id="toastContainer" class="toast-container hidden">
+      <p id="toastMessage"></p>
+    </div>
+
+    <div id="judgePanel" style="display: none;">
+      <h2>Submissions</h2>
+      <div id="judgeResults"></div>
+      <audio id="judgePlayer" controls style="margin-top: 20px; display: none;"></audio>
+    </div>
+
+    <div id="leaderboard" style="display:none; text-align: center">
+      <h2>Leaderboard</h2>
+      <div id="leaderboardList" class="leaderboard-list"></div>
+      <p id="countdownText" style="margin-top: 15px; font-weight: bold;"></p>
+    </div>
+
+    <canvas></canvas>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
+      integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script src="./js/classes/Player.js"></script>
+    <script src="./js/index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,310 @@
+#lobbyUI {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    color: white;
+    font-family: sans-serif;
+}
+
+#circleContainer {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 100px auto 0;
+}
+
+#gameLogo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    width: 120px;
+}
+
+#roomCode {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+}
+
+#confirmText {
+    color: black !important;
+    font-weight: 500;
+}
+
+.playerSlot {
+    position: absolute;
+    width: 100px;
+    height: 40px;
+    background: #333;
+    color: white;
+    border-radius: 8px;
+    line-height: 40px;
+    font-weight: bold;
+}
+
+.track {
+    padding: 10px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.track:hover {
+    background: #2a3a4f; /* Blueish gray */
+}
+
+/* Message modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px 32px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    color: black; /* ✅ Fixes the invisible text */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content button {
+    margin-top: 16px;
+    padding: 10px 16px;
+    background-color: #3a7bd5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.modal-content button:hover {
+    background-color: #2e5cad;
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #222;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10000;
+}
+
+.toast-container.show {
+    opacity: 1;
+}
+
+.hidden {
+    display: none;
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.leaderboard-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 300px;
+    background: linear-gradient(to right, #3a7bd5, #6dd5ed);
+    padding: 10px 16px;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.leaderboard-entry .rank {
+    width: 20px;
+    text-align: center;
+}
+
+.leaderboard-entry .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: 0 10px;
+}
+
+.leaderboard-entry .name {
+    flex-grow: 1;
+    text-align: left;
+    padding-left: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.leaderboard-entry .score {
+    min-width: 40px;
+    text-align: right;
+}  
+
+#startGameBtn {
+    margin-top: 50px;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    background-color: #3a7bd5;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#slot0 { top: 0%; left: 50%; transform: translate(-50%, -50%); }
+#slot1 { top: 25%; left: 90%; transform: translate(-50%, -50%); }
+#slot2 { top: 75%; left: 90%; transform: translate(-50%, -50%); }
+#slot3 { top: 100%; left: 50%; transform: translate(-50%, -50%); }
+#slot4 { top: 75%; left: 10%; transform: translate(-50%, -50%); }
+#slot5 { top: 25%; left: 10%; transform: translate(-50%, -50%); }
+
+body {
+    margin: 0;
+}
+
+h2 {
+    margin: 20px 0 12px 0; /* top, right, bottom, left */
+}
+
+/* General reset for input elements */
+input, textarea, select, button {
+    font-family: inherit;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+/* Text inputs */
+input[type="text"],
+textarea,
+input[type="search"] {
+    background-color: #0f0f1a; /* dark background */
+    color: #e0e0ff;           /* soft light text */
+    border: 1px solid #1a1a2e;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #3a7bd5;    /* vibrant blue border on focus */
+    box-shadow: 0 0 0 2px rgba(58, 123, 213, 0.5);
+}
+
+/* Placeholder styling */
+::placeholder {
+    color: #888ca3;
+    opacity: 0.6;
+}
+
+/* Buttons */
+button {
+    background-color: #3a7bd5;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+button:hover {
+    background-color: #2e5cad;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Optional: custom scrollbars for textarea */
+textarea::-webkit-scrollbar {
+    width: 6px;
+}
+textarea::-webkit-scrollbar-thumb {
+    background-color: #3a7bd5;
+    border-radius: 3px;
+}
+
+/* Remove all browser default spacing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Reset margins and set black background */
+body {
+    margin: 0;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* horizontal centering */
+}
+  
+/* Position name form centered at the top */
+#nameForm {
+    position: absolute;
+    top: 20px; /* adjust this to control vertical placement */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}  
+  
+/* Input styling */
+#nameForm input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #1a1a2e;
+    background-color: #0f0f1a;
+    color: #e0e0ff;
+    width: 200px;
+    font-size: 1rem;
+}
+  
+/* Button styling */
+#nameForm button {
+    background-color: #3a7bd5;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+  
+#nameForm button:hover {
+    background-color: #2e5cad;
+}  

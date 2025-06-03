@@ -1,0 +1,4 @@
+node_modules/
+.env
+TrackMatch Firebase Service Account.json
+*.log
