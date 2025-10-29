@@ -33,16 +33,24 @@
     </script>
   </head>
   <body>
-    <div id="nameForm">
+    <div id="modeSelectScreen">
+      <div id="modeButtons">
+        <button onclick="selectMode('host')">Host Game</button>
+        <button onclick="selectMode('join')">Join a Friend</button>
+      </div>
+      <img id="modeLogo" src="./assets/logo-nbg.png" alt="Game Logo" />
+      <h2 id="logoTitle">TrackMatch</h2>
+    </div>
+
+    <div id="nameForm" style="display: none;">
       <input type="text" id="playerNameInput" placeholder="Enter Your Name"/>
-      <button onclick="createRoom()">Create Room</button>
+      <button id="createRoomBtn" onclick="createRoom()">Create Room</button>
       <input type="text" id="roomCodeInput" placeholder="Room Code (e.g., ABCD)" maxlength="4" style="text-transform: uppercase;" />
-      <button onclick="joinRoom()">Join Room</button>
-      <!-- <button onclick="submitName()">Join</button> -->
+      <button id="joinRoomBtn" onclick="joinRoom()">Join Room</button>
     </div>
 
     <div id="lobbyUI">
-      <div id="circleContainer">
+      <div id="circleContainer" style="display: none;">
         <img id="gameLogo" src="./assets/logo-nbg.png" alt="Game Logo" />
         <div id="roomCode">TrackMatch</div> <!--placeholder-->
     
@@ -55,7 +63,7 @@
         <div class="playerSlot" id="slot5"></div>
       </div>
     
-      <button id="startGameBtn">Start Game</button>
+      <button id="startGameBtn" style="display: none;">Start Game</button>
     </div>
 
     <div id="judgeUI" style="display: none;">

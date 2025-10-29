@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
 const admin = require('firebase-admin')
 
 // Before commiting to github, swap these
+// const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 const serviceAccount = require('./TrackMatch Firebase Service Account.json')
 
 admin.initializeApp({

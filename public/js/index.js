@@ -414,6 +414,27 @@ function generateRoomCode() {
   return code
 }
 
+function selectMode(mode) {
+  document.getElementById('modeSelectScreen').style.display = 'none'
+  const nameForm = document.getElementById('nameForm')
+  nameForm.style.display = 'flex'
+
+  const createBtn = document.getElementById('createRoomBtn')
+  const joinBtn = document.getElementById('joinRoomBtn')
+  const roomCodeInput = document.getElementById('roomCodeInput')
+  document.getElementById('circleContainer').style.display = 'block'
+
+  if (mode === 'host') {
+    createBtn.style.display = 'inline-block'
+    joinBtn.style.display = 'none'
+    roomCodeInput.style.display = 'none'
+  } else if (mode === 'join') {
+    createBtn.style.display = 'none'
+    joinBtn.style.display = 'inline-block'
+    roomCodeInput.style.display = 'inline-block'
+  }
+}
+
 function createRoom() {
   const name = document.getElementById("playerNameInput").value.trim()
   
