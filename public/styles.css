@@ -35,6 +35,13 @@
     font-weight: 500;
 }
 
+#submissionProgress {
+    background: linear-gradient(to right, #3a7bd5, #6dd5ed);
+    height: 24px;
+    width: 0%;
+    transition: width 0.4s;
+}  
+
 .playerSlot {
     position: absolute;
     width: 100px;
@@ -47,9 +54,58 @@
 }
 
 .track {
-    padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px;
+  background-color: #111;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.track-cover {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
     border-radius: 6px;
-    transition: background 0.2s;
+}
+
+.track-content {
+    flex-grow: 1;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.track-title {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px; /* adjust if needed */
+    display: block;
+}
+
+.track-artist {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+    display: block;
+    color: #aaa;
+}
+
+.select-winner-btn {
+    padding: 6px 12px;
+    background-color: #3b82f6;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .track:hover {
@@ -307,4 +363,9 @@ body {
   
 #nameForm button:hover {
     background-color: #2e5cad;
+}
+
+#judgeResults {
+    width: 100%;
+    margin: 0 auto;
 }  

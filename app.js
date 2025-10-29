@@ -19,12 +19,11 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 })
 
-// const submissions = {}
-// let judgeQueues = {}
-// let judgeIndexes = {}
-
 const admin = require('firebase-admin')
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
+// Before commiting to github, swap these
+const serviceAccount = require('./TrackMatch Firebase Service Account.json')
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://trackmatch-3b0b8-default-rtdb.firebaseio.com/"
@@ -88,13 +87,31 @@ io.on('connection', (socket) => {  // each time a user connects, the socket argu
         const nonJudges = Object.keys(playersSnap).filter(id => !playersSnap[id].isJudge)
         const submissionsSnap = await ref(`rooms/${roomCode}/submissions`).get()
         const submissions = submissionsSnap.exists() ? submissionsSnap.val() : {}
-        const allSubmitted = nonJudges.every(id => submissions[id])
+
         console.log(`${playersSnap[socket.id].name} submitted:`, track)
 
-        if (allSubmitted) {
-            console.log('All non-judge players have submitted. Sending to judge...')
-            io.to(roomCode).emit('allSubmissionsIn', submissions)
+        // 🔥 NEW: Emit submission progress to the judge
+        const submittedCount = Object.keys(submissions).length
+        const totalPlayers = nonJudges.length
+        const judgeEntry = Object.entries(playersSnap).find(([_, p]) => p.isJudge)
+        const judgeSocketId = judgeEntry ? judgeEntry[0] : null
+      
+        if (judgeSocketId) {
+          io.to(judgeSocketId).emit('submissionProgressUpdate', {
+            submittedCount,
+            totalPlayers
+          })
         }
+
+        const allSubmitted = nonJudges.every(id => submissions[id])
+        if (allSubmitted) {
+            console.log('All non-judge players have submitted. Waiting 1 second...')
+          
+            setTimeout(() => {
+              console.log('Sending to judge...')
+              io.to(roomCode).emit('allSubmissionsIn', submissions)
+            }, 1000) // Delay by 1000 milliseconds = 1 second
+          }          
     })
 
     socket.on('winnerSelected', async ({ roomCode, winnerId }) => {
@@ -161,29 +178,24 @@ io.on('connection', (socket) => {  // each time a user connects, the socket argu
         const updatedPlayers = snapshot.exists() ? snapshot.val() : {};
         const playerIds = Object.keys(updatedPlayers);
       
-        // === 🧹 Delete room if empty ===
         if (playerIds.length === 0) {
           await roomRef.remove();
           console.log(`🗑️ Room ${roomCode} deleted (no players left)`);
           return;
         }
       
-        // === 🪪 Reassign host ===
         if (wasHost) {
           const newHostId = playerIds[0];
           updatedPlayers[newHostId].isHost = true;
           await ref(`rooms/${roomCode}/players/${newHostId}/isHost`).set(true);
         }
       
-        // === 🛑 End game if 1 player left ===
         if (playerIds.length === 1) {
           io.to(roomCode).emit('gameEnded', { reason: 'Only one player remaining. Game ended.' });
         }
       
-        // === 📣 Notify remaining players ===
         io.to(roomCode).emit('showToast', `${playerName} has left the game`);
       
-        // === 🔄 Update player list ===
         io.to(roomCode).emit('updatePlayers', updatedPlayers);
     });      
 })
@@ -233,6 +245,8 @@ async function startRound(roomCode) {
 
     const judgeId = judgeQueue[currentIndex];
     playersSnap[judgeId].isJudge = true;
+    const judgeName = playersSnap[judgeId]?.name || 'Unknown Judge'
+
     const nextIndex = (currentIndex + 1) % judgeQueue.length;
     await ref(`rooms/${roomCode}/judgeIndex`).set(nextIndex);
 
@@ -251,5 +265,5 @@ async function startRound(roomCode) {
 
     io.to(roomCode).emit('updatePlayers', updatedPlayersSnap)
     io.to(roomCode).emit('gameStarted')
-    io.to(roomCode).emit('selectTheme', { judgeId, themeChoices })
+    io.to(roomCode).emit('selectTheme', { judgeId, themeChoices, judgeName })
 }

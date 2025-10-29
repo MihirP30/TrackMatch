@@ -15,7 +15,8 @@
         projectId: "trackmatch-3b0b8",
         storageBucket: "trackmatch-3b0b8.firebasestorage.app",
         messagingSenderId: "518540168682",
-        appId: "1:518540168682:web:6d48b46e77b6d706ad7693"
+        appId: "1:518540168682:web:6d48b46e77b6d706ad7693",
+        databaseURL: "https://trackmatch-3b0b8-default-rtdb.firebaseio.com/"
       };
     
       // Initialize Firebase
@@ -28,6 +29,7 @@
       window.firebaseSet = set;
       window.firebaseOnValue = onValue;
       window.firebaseUpdate = update;
+      window.firebaseGet = get;
     </script>
   </head>
   <body>
@@ -66,11 +68,24 @@
       </div>
     </div>
 
+    <div id="judgeWaitingUI" style="display: none; text-align: center;">
+      <h2 id="waitingForSubmitions">Waiting for players to submit...</h2>
+      <div style="width: 80%; margin: auto; background-color: #ddd; border-radius: 8px; overflow: hidden;">
+        <div id="submissionProgress" style="height: 24px; width: 0%; background-color: #4CAF50; transition: width 0.4s;"></div>
+      </div>
+      <p id="submissionProgressText">0 / 0 submissions received</p>
+    </div>    
+
+    <div id="nonJudgeUI" style="display: none;">
+      <h2 id="judgeNameDisplay"></h2>
+      <p id="waitingForJudge"></p>
+    </div>
+
     <div id="submitUI" style="display: none;">
       <h2>Theme: <span id="currentThemeText"></span></h2>
       <input type="text" id="searchInput" placeholder="Search for a song..." />
       <button onclick="searchSongs()">Search</button>
-    
+      <div class="instructions">Click a song cover to preview. Click "Select" to choose the song.</div>
       <div id="results"></div>
     
       <audio id="player" controls style="margin-top: 20px; display: none;"></audio>
@@ -99,6 +114,7 @@
 
     <div id="judgePanel" style="display: none;">
       <h2>Submissions</h2>
+      <div id="judgeInstructions" class="instructions">Click a song cover to preview. Click "Select" to choose the winner.</div>
       <div id="judgeResults"></div>
       <audio id="judgePlayer" controls style="margin-top: 20px; display: none;"></audio>
     </div>

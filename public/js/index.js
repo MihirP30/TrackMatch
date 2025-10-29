@@ -34,9 +34,10 @@ socket.on('gameStarted', () => {
   document.getElementById('lobbyUI').style.display = 'none'
 })
 
-socket.on('selectTheme', ({ judgeId, themeChoices }) => {
+socket.on('selectTheme', ({ judgeId, themeChoices, judgeName }) => {
   const amIJudge = (socket.id === judgeId)
   document.getElementById('judgeUI').style.display = 'none'
+  document.getElementById('nonJudgeUI').style.display = 'none'
 
   if (amIJudge) {
     document.getElementById('judgeUI').style.display = 'block'
@@ -59,13 +60,28 @@ socket.on('selectTheme', ({ judgeId, themeChoices }) => {
       }
     }
   }
+
+  else {
+    // Display judge name and waiting message
+    document.getElementById('nonJudgeUI').style.display = 'block'
+    document.getElementById('judgeNameDisplay').textContent = `Judge: ${judgeName}`
+    document.getElementById('waitingForJudge').textContent = "Waiting for the judge to choose a theme..."
+  }
 })
 
 socket.on('broadcastTheme', (theme) => {
+  document.getElementById('waitingForJudge').style.display = 'none'
+  
   const me = players[myId]
   if (me && !me.isJudge) {
     document.getElementById('submitUI').style.display = 'block'
     document.getElementById('currentThemeText').textContent = theme
+  }
+  else if (me?.isJudge) {
+    document.getElementById('judgeWaitingUI').style.display = 'block'
+
+    const totalPlayers = Object.values(players).filter(p => !p.isJudge).length
+    updateSubmissionProgress(0, totalPlayers) // start at 0
   }
 })
 
@@ -82,7 +98,7 @@ socket.on('updatePlayers', (backendPlayers) => {
       players[id].name = backendPlayer.name
       players[id].isHost = backendPlayer.isHost
       players[id].isJudge = backendPlayer.isJudge
-    } 
+    }
   }
   console.log(players)
 
@@ -105,16 +121,23 @@ socket.on('updatePlayers', (backendPlayers) => {
   document.getElementById('startGameBtn').style.display = me?.isHost ? 'inline-block' : 'none'  // make the Start Game button only visible to the host
 })
 
-socket.on('allSubmissionsIn', (submissions) => {
-  const me = players[socket.id]
-  if (!me || !me.isJudge) return
+socket.on('submissionProgressUpdate', ({ submittedCount, totalPlayers }) => {
+  updateSubmissionProgress(submittedCount, totalPlayers)
+})
 
-  // Clear the judge panel and make it visible
-  document.getElementById('judgePanel').style.display = 'block'
+socket.on('allSubmissionsIn', (submissions) => {
+  // Hide judge waiting UI for judge
+  document.getElementById('judgeWaitingUI').style.display = 'none'
+
+  // Show the results panel for ALL players
   const judgeResults = document.getElementById('judgeResults')
   judgeResults.innerHTML = ''
+  document.getElementById('judgePanel').style.display = 'block'
 
-  // Populate the judge panel
+  const me = players[socket.id]
+  const isJudge = me?.isJudge
+  document.getElementById('judgeInstructions').style.display = isJudge ? 'block' : 'none'
+
   for (const id in submissions) {
     const track = submissions[id]
 
@@ -124,7 +147,7 @@ socket.on('allSubmissionsIn', (submissions) => {
     div.style.alignItems = 'center'
     div.style.marginBottom = '10px'
 
-    // Cover image
+    // Cover art (clickable)
     const img = document.createElement('img')
     img.src = track.cover
     img.alt = 'cover art'
@@ -139,17 +162,48 @@ socket.on('allSubmissionsIn', (submissions) => {
       player.play()
     }
 
-    // Text
     const textDiv = document.createElement('div')
-    textDiv.innerHTML = `<strong>${track.title}</strong><br><small>${track.artist}</small>`
-    textDiv.style.cursor = 'pointer'
-    textDiv.onclick = () => {
-      socket.emit('winnerSelected', {roomCode: window.currentRoomCode, winnerId: id })
-      document.getElementById('judgePanel').style.display = 'none'
-    }
+    textDiv.className = 'track-content'
 
+    const titleEl = document.createElement('span')
+    titleEl.className = 'track-title'
+    titleEl.textContent = track.title
+
+    const artistEl = document.createElement('span')
+    artistEl.className = 'track-artist'
+    artistEl.textContent = track.artist
+
+    textDiv.appendChild(titleEl)
+    textDiv.appendChild(artistEl)
     div.appendChild(img)
     div.appendChild(textDiv)
+
+    // ✅ Only show "Select" button for the judge
+    const selectBtn = document.createElement('button')
+    selectBtn.textContent = 'Select'
+    selectBtn.className = 'select-winner-btn'
+    selectBtn.style.marginLeft = '20px'
+
+    // Judge can see and click the button
+    if (isJudge) {
+      selectBtn.onclick = () => {
+        socket.emit('winnerSelected', { roomCode: window.currentRoomCode, winnerId: id })
+        const player = document.getElementById('judgePlayer')
+        if (player && !player.paused) {
+          player.pause()
+          player.currentTime = 0
+          player.style.display = 'none'
+        }
+        document.getElementById('judgePanel').style.display = 'none'
+      }
+    } else {
+      // Non-judge: preserve layout without showing or enabling button
+      selectBtn.style.visibility = 'hidden'
+      selectBtn.disabled = true
+    }
+
+    // Append it no matter what
+    div.appendChild(selectBtn)
     judgeResults.appendChild(div)
   }
 })
@@ -284,11 +338,15 @@ async function searchSongs() {
 
     const textDiv = document.createElement('div')
     textDiv.innerHTML = `<strong>${track.title}</strong><br><small>${track.artist.name}</small>`
-    textDiv.style.cursor = 'pointer'
-    textDiv.onclick = () => confirmSubmit(track)
+
+    const selectBtn = document.createElement('button')
+    selectBtn.textContent = 'Select'
+    selectBtn.style.marginLeft = '20px'
+    selectBtn.onclick = () => confirmSubmit(track)
 
     div.appendChild(img)
     div.appendChild(textDiv)
+    div.appendChild(selectBtn)
     resultsDiv.appendChild(div)
   })
 }
@@ -298,6 +356,12 @@ function playPreview(url) {
   player.src = url
   player.style.display = 'block'
   player.play()
+}
+
+function updateSubmissionProgress(current, total) {
+  const percent = Math.floor((current / total) * 100)
+  document.getElementById('submissionProgress').style.width = `${percent}%`
+  document.getElementById('submissionProgressText').textContent = `${current} / ${total} submissions received`
 }
 
 function confirmSubmit(track) {
@@ -349,15 +413,6 @@ function generateRoomCode() {
   }
   return code
 }
-
-// function submitName() {
-//   const playerName = document.getElementById("playerNameInput").value.trim()
-//   if (playerName) {
-//     socket.emit('playerJoined', playerName)
-//     document.getElementById('nameForm').style.display = 'none'
-//   }
-// }
-// window.submitName = submitName
 
 function createRoom() {
   const name = document.getElementById("playerNameInput").value.trim()
